@@ -10,6 +10,16 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-pixel: var(--font-pixelify);
+}
+
+/* Capture brand palette, sampled from the Figma mockup */
+@theme {
+  --color-capture-blue: #6a89d8;
+  --color-capture-sky: #a9c3f5;
+  --color-capture-card: #9fb9f0;
+  --color-capture-input: #edf2fc;
+  --color-capture-paper: #f1f1f1;
 }
 
 @media (prefers-color-scheme: dark) {
