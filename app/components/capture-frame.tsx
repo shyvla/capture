@@ -1,5 +1,28 @@
 import Link from "next/link";
 
+export function CaptureHeader() {
+  return (
+    <header className="z-20 flex items-center justify-between gap-4 bg-capture-blue px-6 py-5 text-white sm:px-10">
+      <Link href="/" className="text-3xl font-bold">
+        Capture
+      </Link>
+      <p className="text-2xl font-bold">Save the moment</p>
+    </header>
+  );
+}
+
+export function CaptureFooter() {
+  return (
+    <footer className="z-20 flex flex-wrap items-center justify-between gap-x-12 gap-y-2 bg-capture-blue px-6 py-6 text-white sm:px-10">
+      <p className="font-semibold">Don&apos;t Sue Me</p>
+      <p className="font-semibold">
+        By using Capture, you agree to allow us to collect, use, and sell all
+        of your personal information.
+      </p>
+    </footer>
+  );
+}
+
 function Polaroid({ className }: { className: string }) {
   return (
     <div
@@ -30,12 +53,7 @@ function PolaroidBackdrop() {
 export function CaptureFrame({ children }: { children: React.ReactNode }) {
   return (
     <div className="font-pixel flex flex-1 flex-col text-black">
-      <header className="z-20 flex items-center justify-between gap-4 bg-capture-blue px-6 py-5 text-white sm:px-10">
-        <Link href="/" className="text-3xl font-bold">
-          Capture
-        </Link>
-        <p className="text-2xl font-bold">Save the moment</p>
-      </header>
+      <CaptureHeader />
 
       <main className="relative flex flex-1 flex-col items-center justify-center px-4 py-16">
         <div className="absolute inset-0 flex flex-col" aria-hidden>
@@ -46,13 +64,7 @@ export function CaptureFrame({ children }: { children: React.ReactNode }) {
         <div className="relative z-10 w-full max-w-2xl">{children}</div>
       </main>
 
-      <footer className="z-20 flex flex-wrap items-center justify-between gap-x-12 gap-y-2 bg-capture-blue px-6 py-6 text-white sm:px-10">
-        <p className="font-semibold">Don&apos;t Sue Me</p>
-        <p className="font-semibold">
-          By using Capture, you agree to allow us to collect, use, and sell all
-          of your personal information.
-        </p>
-      </footer>
+      <CaptureFooter />
     </div>
   );
 }

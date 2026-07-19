@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { logout } from "@/app/actions/auth";
 import { CaptureFrame } from "@/app/components/capture-frame";
@@ -32,14 +33,16 @@ export default async function HomePage() {
           You&apos;re signed in as {user.email}. The feed and photobooth are
           coming soon.
         </p>
-        <form action={logout} className="mt-8">
-          <button
-            type="submit"
-            className="cursor-pointer text-lg font-semibold hover:underline"
-          >
-            Log Out
-          </button>
-        </form>
+        <div className="mt-8 flex items-center justify-center gap-10 text-lg font-semibold">
+          <Link href="/profile" className="hover:underline">
+            My Account
+          </Link>
+          <form action={logout}>
+            <button type="submit" className="cursor-pointer hover:underline">
+              Log Out
+            </button>
+          </form>
+        </div>
       </div>
     </CaptureFrame>
   );
