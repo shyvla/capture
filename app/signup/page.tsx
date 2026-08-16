@@ -1,18 +1,10 @@
-import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
-import { AuthShell } from "@/app/components/auth-shell";
-import { SignupForm } from "./signup-form";
+import { CaptureFrame } from "@/app/components/capture-frame";
+import { SignupForm } from "@/app/components/signup-form";
 
-export default async function SignupPage() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (user) redirect("/");
-
+export default function SignupPage() {
   return (
-    <AuthShell tagline="new trainer registration">
+    <CaptureFrame>
       <SignupForm />
-    </AuthShell>
+    </CaptureFrame>
   );
 }

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Press_Start_2P, VT323 } from "next/font/google";
+import { Geist, Geist_Mono, Pixelify_Sans } from "next/font/google";
 import "./globals.css";
 
 const pressStart = Press_Start_2P({
@@ -14,10 +14,15 @@ const vt323 = VT323({
   subsets: ["latin"],
 });
 
+const pixelifySans = Pixelify_Sans({
+  variable: "--font-pixelify",
+  subsets: ["latin"],
+});
+
 export const metadata: Metadata = {
-  title: "Capture ★ share film-style photos",
+  title: "Capture — Save the moment",
   description:
-    "Capture is a place to share film-style photos, decorate them in the photo booth, and trade snapshots with friends.",
+    "Share film-style photos with friends. No pressure, just moments.",
 };
 
 export default function RootLayout({
@@ -28,7 +33,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${pressStart.variable} ${vt323.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${pixelifySans.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">{children}</body>
     </html>

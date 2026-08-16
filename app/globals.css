@@ -16,14 +16,25 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --color-blue-brand: var(--blue);
-  --color-blue-deep: var(--blue-deep);
-  --color-blue-sky: var(--blue-sky);
-  --color-blue-pale: var(--blue-pale);
-  --color-yellow-brand: var(--yellow);
-  --color-yellow-soft: var(--yellow-soft);
-  --font-pixel: var(--font-press-start);
-  --font-retro: var(--font-vt323);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --font-pixel: var(--font-pixelify);
+}
+
+/* Capture brand palette, sampled from the Figma mockup */
+@theme {
+  --color-capture-blue: #6a89d8;
+  --color-capture-sky: #a9c3f5;
+  --color-capture-card: #9fb9f0;
+  --color-capture-input: #edf2fc;
+  --color-capture-paper: #f1f1f1;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
 }
 
 body {
