@@ -1,26 +1,185 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Capture palette: blue + white + yellow accents */
+  --background: #dceeff;
+  --foreground: #6577c8;
+  --blue: #7da7f5;
+  --blue-deep: #6577c8;
+  --blue-sky: #9ed1ff;
+  --blue-pale: #eaf5ff;
+  --yellow: #ffe470;
+  --yellow-soft: #fff8d6;
+  --white: #ffffff;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-blue-brand: var(--blue);
+  --color-blue-deep: var(--blue-deep);
+  --color-blue-sky: var(--blue-sky);
+  --color-blue-pale: var(--blue-pale);
+  --color-yellow-brand: var(--yellow);
+  --color-yellow-soft: var(--yellow-soft);
+  --font-pixel: var(--font-press-start);
+  --font-retro: var(--font-vt323);
 }
 
 body {
-  background: var(--background);
+  /* Ombre sky: near-white at the top fading into a deeper pastel blue */
+  background: linear-gradient(
+    180deg,
+    #f4faff 0%,
+    #dceeff 40%,
+    #b7dcff 75%,
+    #9ecfff 100%
+  );
+  background-attachment: fixed;
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-vt323), monospace;
+  image-rendering: pixelated;
+}
+
+/* --- Pixel UI kit ------------------------------------------------------ */
+
+.pixel-card {
+  background: var(--white);
+  border: 4px solid var(--blue-deep);
+  border-radius: 16px;
+  box-shadow:
+    0 0 0 4px var(--white),
+    0 0 0 8px var(--blue),
+    12px 14px 0 0 color-mix(in srgb, var(--blue-deep) 22%, transparent);
+}
+
+.pixel-btn {
+  font-family: var(--font-press-start), monospace;
+  font-size: 0.65rem;
+  line-height: 1;
+  padding: 0.9rem 1.1rem;
+  border: 3px solid var(--blue-deep);
+  border-radius: 10px;
+  box-shadow: 4px 4px 0 0 var(--blue-deep);
+  cursor: pointer;
+  transition: transform 60ms steps(2), box-shadow 60ms steps(2);
+  text-align: center;
+  display: inline-block;
+}
+
+.pixel-btn:hover {
+  transform: translate(1px, 1px);
+  box-shadow: 3px 3px 0 0 var(--blue-deep);
+}
+
+.pixel-btn:active {
+  transform: translate(4px, 4px);
+  box-shadow: 0 0 0 0 var(--blue-deep);
+}
+
+.pixel-btn:disabled {
+  opacity: 0.6;
+  cursor: wait;
+  transform: none;
+}
+
+.pixel-btn-yellow {
+  background: var(--yellow);
+  color: var(--blue-deep);
+}
+
+.pixel-btn-blue {
+  background: var(--blue);
+  color: var(--white);
+}
+
+.pixel-btn-white {
+  background: var(--white);
+  color: var(--blue-deep);
+}
+
+.pixel-input {
+  font-family: var(--font-vt323), monospace;
+  font-size: 1.35rem;
+  line-height: 1.2;
+  width: 100%;
+  padding: 0.45rem 0.7rem;
+  background: var(--blue-pale);
+  border: 3px solid var(--blue-deep);
+  border-radius: 10px;
+  color: var(--blue-deep);
+}
+
+.pixel-input::placeholder {
+  color: color-mix(in srgb, var(--blue-deep) 45%, transparent);
+}
+
+.pixel-input:focus {
+  outline: 3px solid var(--yellow);
+  outline-offset: 1px;
+}
+
+.pixel-label {
+  font-family: var(--font-press-start), monospace;
+  font-size: 0.55rem;
+  letter-spacing: 0.05em;
+  color: var(--blue);
+  text-transform: uppercase;
+}
+
+.pixel-link {
+  font-family: var(--font-press-start), monospace;
+  font-size: 0.55rem;
+  color: var(--blue);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.pixel-link:hover {
+  color: var(--blue-deep);
+  background: var(--yellow-soft);
+}
+
+.pixel-alert-error {
+  font-size: 1.15rem;
+  line-height: 1.25;
+  border: 3px solid #b3261e;
+  background: #ffe3e0;
+  color: #7f1d1d;
+  border-radius: 10px;
+  padding: 0.5rem 0.75rem;
+}
+
+.pixel-alert-success {
+  font-size: 1.15rem;
+  line-height: 1.25;
+  border: 3px solid var(--blue-deep);
+  background: var(--yellow-soft);
+  color: var(--blue-deep);
+  border-radius: 10px;
+  padding: 0.5rem 0.75rem;
+}
+
+/* --- Sky decorations ---------------------------------------------------- */
+
+@keyframes twinkle {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.35; transform: scale(0.8); }
+}
+
+.star-twinkle {
+  animation: twinkle 1.6s steps(2) infinite;
+}
+
+.star-twinkle-slow {
+  animation: twinkle 2.7s steps(2) infinite;
+}
+
+@keyframes bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+.pixel-bob {
+  animation: bob 2.4s steps(3) infinite;
 }
