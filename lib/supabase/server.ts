@@ -1,12 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 
-export function isSupabaseConfigured() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  return Boolean(url && key && !url.includes("your-project-ref"));
-}
-
 export async function createClient() {
   const cookieStore = await cookies();
 
@@ -24,8 +18,8 @@ export async function createClient() {
               cookieStore.set(name, value, options)
             );
           } catch {
-            // Called from a Server Component, where cookies are read-only.
-            // Session refresh is handled by proxy.ts instead.
+            // Called from a Server Component: safe to ignore when the
+            // proxy is refreshing sessions.
           }
         },
       },
