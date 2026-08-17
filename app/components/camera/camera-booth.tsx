@@ -567,7 +567,7 @@ export function CameraBooth({
   }
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-6">
       <h1 className="font-pixel text-sm text-blue-deep [text-shadow:2px_2px_0_var(--yellow)]">
         PHOTO BOOTH
       </h1>
@@ -700,7 +700,7 @@ export function CameraBooth({
 
       {/* Editing UI */}
       {phase === "edit" && capture && (
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-6">
           <div className="pixel-card px-5 py-4">
             <p className="pixel-label mb-3">FILM STOCK</p>
             <FilterStrip
@@ -775,7 +775,7 @@ export function CameraBooth({
 
       {/* Posting UI */}
       {(phase === "post" || phase === "posting") && capture && (
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-6">
           <div className="pixel-card px-5 py-4">
             <label htmlFor="caption" className="pixel-label mb-2 block">
               CAPTION (OPTIONAL)
