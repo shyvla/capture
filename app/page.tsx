@@ -2,10 +2,10 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { fetchFeedPage } from "@/lib/feed";
-import { signOut } from "@/app/auth/actions";
+import { AppHeader } from "@/app/components/app-header";
 import { FeedClient } from "@/app/components/feed/feed-client";
 import { StoriesRow } from "@/app/components/feed/stories-row";
-import { PixelPlane, PixelSky, PixelStar } from "@/app/components/pixel-art";
+import { PixelSky } from "@/app/components/pixel-art";
 
 // Home = the film feed. The proxy redirects signed-out visitors to /login,
 // and this double-checks in case the route is reached another way.
@@ -31,34 +31,24 @@ export default async function Home() {
         <PixelSky />
       </div>
 
-      <header className="sticky top-0 z-40 border-b-4 border-[var(--blue-deep)] bg-[rgba(244,250,255,0.88)] backdrop-blur">
-        <div className="mx-auto flex w-full max-w-[40rem] items-center justify-between px-4 py-3">
-          <Link
-            href="/"
-            className="font-pixel flex items-center gap-2 text-sm text-blue-deep [text-shadow:2px_2px_0_var(--yellow)]"
-          >
-            <PixelStar size={18} /> CAPTURE
-          </Link>
-          <div className="flex items-center gap-4">
-            <form action={signOut}>
-              <button type="submit" className="pixel-link">
-                SIGN OUT
-              </button>
-            </form>
-            <Link
-              href="/messages"
-              aria-label="Direct messages"
-              className="pixel-icon-btn"
-            >
-              <PixelPlane size={28} />
-            </Link>
-          </div>
-        </div>
-      </header>
+      <AppHeader myUsername={profile?.username} />
 
-      <main className="relative z-10 mx-auto w-full max-w-[40rem] flex-1 px-4 pb-16 pt-6">
+      {/* No z-index here: modals inside must be able to layer above the z-40
+          header, and DOM order already keeps main above the fixed sky. */}
+      <main className="relative mx-auto w-full max-w-[40rem] flex-1 px-4 pb-16 pt-6">
         <p className="mb-4 text-xl text-blue-brand">
-          hi @{profile?.username ?? "friend"}, here&apos;s what everyone captured ✦
+          hi{" "}
+          {profile ? (
+            <Link
+              href={`/u/${profile.username}`}
+              className="underline underline-offset-4"
+            >
+              @{profile.username}
+            </Link>
+          ) : (
+            "@friend"
+          )}
+          , here&apos;s what everyone captured ✦
         </p>
         <StoriesRow myUsername={profile?.username ?? "you"} />
         <FeedClient initialPosts={feed.posts} initialCursor={feed.nextCursor} />

@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState, useTransition } from "react";
 import type { FeedComment, FeedPost } from "@/lib/feed";
 import { addComment, setCommentLike, setPostLike } from "@/app/feed/actions";
@@ -19,11 +20,19 @@ function CommentRow({
 }) {
   return (
     <div className="flex items-start gap-2">
-      <PixelAvatar username={comment.author.username} size={26} />
+      <Link
+        href={`/u/${comment.author.username}`}
+        aria-label={`@${comment.author.username}'s profile`}
+      >
+        <PixelAvatar username={comment.author.username} size={26} />
+      </Link>
       <p className="flex-1 text-xl leading-tight">
-        <span className="font-pixel text-[0.5rem] text-blue-deep">
+        <Link
+          href={`/u/${comment.author.username}`}
+          className="font-pixel text-[0.5rem] text-blue-deep hover:underline"
+        >
           @{comment.author.username}
-        </span>{" "}
+        </Link>{" "}
         {comment.comment}
       </p>
       <button
@@ -105,13 +114,21 @@ export function PostCard({ post }: { post: FeedPost }) {
     <article className="pixel-card overflow-hidden">
       {/* header */}
       <div className="flex items-center gap-3 px-4 py-3">
-        <PixelAvatar username={post.author.username} size={38} />
-        <div className="min-w-0 flex-1 leading-tight">
-          <p className="font-pixel truncate text-[0.6rem] text-blue-deep">
-            {post.author.displayName}
-          </p>
-          <p className="truncate text-lg text-blue-brand">@{post.author.username}</p>
-        </div>
+        <Link
+          href={`/u/${post.author.username}`}
+          className="flex min-w-0 flex-1 items-center gap-3"
+          aria-label={`@${post.author.username}'s profile`}
+        >
+          <PixelAvatar username={post.author.username} size={38} />
+          <span className="min-w-0 flex-1 leading-tight">
+            <span className="font-pixel block truncate text-[0.6rem] text-blue-deep">
+              {post.author.displayName}
+            </span>
+            <span className="block truncate text-lg text-blue-brand">
+              @{post.author.username}
+            </span>
+          </span>
+        </Link>
         {post.isDiscovery && <span className="pixel-badge">✦ suggested</span>}
         <span className="text-lg text-blue-brand">{timeAgo(post.createdAt)}</span>
       </div>
@@ -188,9 +205,12 @@ export function PostCard({ post }: { post: FeedPost }) {
         {/* caption */}
         {post.caption && (
           <p className="text-xl leading-tight">
-            <span className="font-pixel text-[0.5rem] text-blue-deep">
+            <Link
+              href={`/u/${post.author.username}`}
+              className="font-pixel text-[0.5rem] text-blue-deep hover:underline"
+            >
               @{post.author.username}
-            </span>{" "}
+            </Link>{" "}
             {post.caption}
           </p>
         )}

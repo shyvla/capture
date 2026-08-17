@@ -56,13 +56,13 @@ function decodeCursor(raw: string | null): Cursor {
 
 // The !fkey hints are required: posts/comments also relate to profiles
 // through the like junction tables, which would make the embed ambiguous.
-const POST_SELECT = `post_id, user_id, caption, like_count, comment_count, created_at,
+export const POST_SELECT = `post_id, user_id, caption, like_count, comment_count, created_at,
   author:profiles!posts_user_id_fkey(username, display_name),
   media:post_media(storage_path, position),
   comments(id, comment, like_count, created_at, author:profiles!comments_user_id_fkey(username, display_name))`;
 
 type AuthorRow = { username: string; display_name: string };
-type PostRow = {
+export type PostRow = {
   post_id: string;
   caption: string;
   like_count: number;
@@ -163,6 +163,20 @@ export async function fetchFeedPage(
     next = { f: all.at(-1)?.created_at ?? cursor.f };
   }
 
+  const posts = await hydratePostRows(supabase, userId, picked);
+  return { posts, nextCursor: hasMore ? encodeCursor(next) : null };
+}
+
+/**
+ * Turn raw post rows into client-ready FeedPosts: look up which posts and
+ * comments the viewer already liked, sort media/comments, build image URLs.
+ * Shared by the feed and profile pages.
+ */
+export async function hydratePostRows(
+  supabase: SupabaseClient,
+  viewerId: string,
+  picked: { row: PostRow; isDiscovery: boolean }[]
+): Promise<FeedPost[]> {
   // Which of these posts/comments has the viewer already liked?
   const postIds = picked.map((p) => p.row.post_id);
   const commentIds = picked.flatMap((p) => p.row.comments.map((c) => c.id));
@@ -171,14 +185,14 @@ export async function fetchFeedPage(
       ? supabase
           .from("post_likes")
           .select("post_id")
-          .eq("user_id", userId)
+          .eq("user_id", viewerId)
           .in("post_id", postIds)
       : { data: [] },
     commentIds.length
       ? supabase
           .from("comment_likes")
           .select("comment_id")
-          .eq("user_id", userId)
+          .eq("user_id", viewerId)
           .in("comment_id", commentIds)
       : { data: [] },
   ]);
@@ -187,7 +201,7 @@ export async function fetchFeedPage(
     (likedCommentRows.data ?? []).map((r) => r.comment_id)
   );
 
-  const posts: FeedPost[] = picked.map(({ row, isDiscovery }) => ({
+  return picked.map(({ row, isDiscovery }) => ({
     postId: row.post_id,
     caption: row.caption,
     likeCount: row.like_count,
@@ -220,6 +234,4 @@ export async function fetchFeedPage(
         },
       })),
   }));
-
-  return { posts, nextCursor: hasMore ? encodeCursor(next) : null };
 }
