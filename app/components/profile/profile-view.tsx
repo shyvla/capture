@@ -132,7 +132,9 @@ function FilmFrame({
 }
 
 export function ProfileView({ data }: { data: ProfilePageData }) {
-  const { profile, isOwn, stats, posts } = data;
+  const { profile, isOwn, stats } = data;
+  // Posts live in state so deleting one updates the sheet and stats in place.
+  const [posts, setPosts] = useState<FeedPost[]>(data.posts);
   const [followers, setFollowers] = useState(stats.followers);
   const [openPost, setOpenPost] = useState<FeedPost | null>(null);
 
@@ -192,7 +194,10 @@ export function ProfileView({ data }: { data: ProfilePageData }) {
         <div className="mt-4 grid grid-cols-3 gap-2">
           <StatTile label="FOLLOWERS" value={followers} />
           <StatTile label="FOLLOWING" value={stats.following} />
-          <StatTile label="TOTAL ♥" value={stats.totalLikes} />
+          <StatTile
+            label="TOTAL ♥"
+            value={posts.reduce((sum, p) => sum + p.likeCount, 0)}
+          />
         </div>
       </section>
 
@@ -270,7 +275,15 @@ export function ProfileView({ data }: { data: ProfilePageData }) {
                 ✕ CLOSE
               </button>
             </div>
-            <PostCard key={openPost.postId} post={openPost} />
+            <PostCard
+              key={openPost.postId}
+              post={openPost}
+              canDelete={isOwn}
+              onDeleted={(postId) => {
+                setPosts((prev) => prev.filter((p) => p.postId !== postId));
+                setOpenPost(null);
+              }}
+            />
           </div>
         </div>
       )}

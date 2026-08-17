@@ -1,5 +1,6 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import type { FeedComment } from "@/lib/feed";
 import {
@@ -66,6 +67,33 @@ export async function setCommentLike(
         .eq("user_id", user.id);
 
   if (error) return { ok: false, error: "Could not update the like" };
+  return { ok: true };
+}
+
+/** Delete one of the viewer's own posts (RLS blocks anyone else's). */
+export async function deletePost(postId: string): Promise<ActionResult> {
+  const { supabase, user } = await requireUser();
+  if (!user) return { ok: false, error: "Not signed in" };
+
+  // Grab the media paths before the row (and its cascade) disappears.
+  const { data: media } = await supabase
+    .from("post_media")
+    .select("storage_path")
+    .eq("post_id", postId);
+
+  const { error, count } = await supabase
+    .from("posts")
+    .delete({ count: "exact" })
+    .eq("post_id", postId)
+    .eq("user_id", user.id);
+  if (error) return { ok: false, error: "Could not delete the post" };
+  if (!count) return { ok: false, error: "Post not found" };
+
+  // Best effort: clear the files from storage (the post row is already gone).
+  const paths = (media ?? []).map((m) => m.storage_path);
+  if (paths.length) await supabase.storage.from("posts").remove(paths);
+
+  revalidatePath("/", "layout");
   return { ok: true };
 }
 

@@ -12,9 +12,12 @@ import { StarBuddy } from "@/app/components/pixel-art";
 export function FeedClient({
   initialPosts,
   initialCursor,
+  myUsername,
 }: {
   initialPosts: FeedPost[];
   initialCursor: string | null;
+  /** Viewer's username — their own posts get a delete control. */
+  myUsername?: string;
 }) {
   const [posts, setPosts] = useState<FeedPost[]>(initialPosts);
   const [cursor, setCursor] = useState<string | null>(initialCursor);
@@ -61,7 +64,14 @@ export function FeedClient({
   return (
     <div className="flex flex-col gap-8">
       {posts.map((post) => (
-        <PostCard key={post.postId} post={post} />
+        <PostCard
+          key={post.postId}
+          post={post}
+          canDelete={post.author.username === myUsername}
+          onDeleted={(postId) =>
+            setPosts((prev) => prev.filter((p) => p.postId !== postId))
+          }
+        />
       ))}
 
       {posts.length === 0 && (

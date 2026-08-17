@@ -210,6 +210,39 @@ export function PixelChatBubble({
   );
 }
 
+/** Trash can for deleting your own posts. */
+export function PixelTrash({
+  className = "",
+  size = 18,
+  color = "var(--blue)",
+}: {
+  className?: string;
+  size?: number;
+  color?: string;
+}) {
+  return (
+    <svg
+      className={className}
+      width={size}
+      height={(size * 8) / 7}
+      viewBox="0 0 7 8"
+      shapeRendering="crispEdges"
+      aria-hidden
+    >
+      <g fill={color}>
+        <rect x="2" y="0" width="3" height="1" />
+        <rect x="0" y="1" width="7" height="1" />
+        <rect x="1" y="2" width="5" height="5" />
+        <rect x="2" y="7" width="3" height="1" />
+      </g>
+      <g fill="var(--white)">
+        <rect x="2" y="3" width="1" height="3" />
+        <rect x="4" y="3" width="1" height="3" />
+      </g>
+    </svg>
+  );
+}
+
 /** Paper airplane for the direct messages link. */
 export function PixelPlane({
   className = "",

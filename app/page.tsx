@@ -51,7 +51,11 @@ export default async function Home() {
           , here&apos;s what everyone captured ✦
         </p>
         <StoriesRow myUsername={profile?.username ?? "you"} />
-        <FeedClient initialPosts={feed.posts} initialCursor={feed.nextCursor} />
+        <FeedClient
+          initialPosts={feed.posts}
+          initialCursor={feed.nextCursor}
+          myUsername={profile?.username}
+        />
       </main>
     </div>
   );

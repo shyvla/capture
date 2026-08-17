@@ -3,11 +3,21 @@
 import Link from "next/link";
 import { useState, useTransition } from "react";
 import type { FeedComment, FeedPost } from "@/lib/feed";
-import { addComment, setCommentLike, setPostLike } from "@/app/feed/actions";
+import {
+  addComment,
+  deletePost,
+  setCommentLike,
+  setPostLike,
+} from "@/app/feed/actions";
 import { timeAgo } from "@/lib/format";
 import { COMMENT_WORD_LIMIT, countWords } from "@/lib/validation";
 import { PixelAvatar } from "@/app/components/pixel-avatar";
-import { PixelChatBubble, PixelHeart, PixelStar } from "@/app/components/pixel-art";
+import {
+  PixelChatBubble,
+  PixelHeart,
+  PixelStar,
+  PixelTrash,
+} from "@/app/components/pixel-art";
 
 const PREVIEW_COMMENTS = 2;
 
@@ -49,7 +59,17 @@ function CommentRow({
   );
 }
 
-export function PostCard({ post }: { post: FeedPost }) {
+export function PostCard({
+  post,
+  canDelete = false,
+  onDeleted,
+}: {
+  post: FeedPost;
+  /** Show the delete control — only pass true for the viewer's own posts. */
+  canDelete?: boolean;
+  /** Called after a successful delete so the parent list can drop the card. */
+  onDeleted?: (postId: string) => void;
+}) {
   const [liked, setLiked] = useState(post.likedByMe);
   const [likeCount, setLikeCount] = useState(post.likeCount);
   const [comments, setComments] = useState<FeedComment[]>(post.comments);
@@ -59,6 +79,25 @@ export function PostCard({ post }: { post: FeedPost }) {
   const [draft, setDraft] = useState("");
   const [commentError, setCommentError] = useState<string | null>(null);
   const [posting, startPosting] = useTransition();
+  const [confirmingDelete, setConfirmingDelete] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [deleting, startDeleting] = useTransition();
+
+  const requestDelete = () => {
+    if (!confirmingDelete) {
+      setConfirmingDelete(true);
+      return;
+    }
+    startDeleting(async () => {
+      const res = await deletePost(post.postId);
+      if (res.ok) {
+        onDeleted?.(post.postId);
+      } else {
+        setConfirmingDelete(false);
+        setDeleteError(res.error);
+      }
+    });
+  };
 
   const toggleLike = () => {
     const next = !liked;
@@ -131,6 +170,37 @@ export function PostCard({ post }: { post: FeedPost }) {
         </Link>
         {post.isDiscovery && <span className="pixel-badge">✦ suggested</span>}
         <span className="text-lg text-blue-brand">{timeAgo(post.createdAt)}</span>
+        {canDelete &&
+          (confirmingDelete ? (
+            <span className="flex items-center gap-1">
+              <button
+                type="button"
+                className="pixel-btn pixel-btn-yellow !px-2 !py-1.5 !text-[0.45rem]"
+                onClick={requestDelete}
+                disabled={deleting}
+              >
+                {deleting ? "…" : "SURE?"}
+              </button>
+              <button
+                type="button"
+                className="pixel-icon-btn"
+                aria-label="Cancel delete"
+                onClick={() => setConfirmingDelete(false)}
+                disabled={deleting}
+              >
+                ✕
+              </button>
+            </span>
+          ) : (
+            <button
+              type="button"
+              className="pixel-icon-btn"
+              aria-label="Delete post"
+              onClick={requestDelete}
+            >
+              <PixelTrash size={15} />
+            </button>
+          ))}
       </div>
 
       {/* media */}
@@ -179,6 +249,7 @@ export function PostCard({ post }: { post: FeedPost }) {
       </div>
 
       <div className="space-y-2 px-4 py-3">
+        {deleteError && <p className="pixel-alert-error">{deleteError}</p>}
         {/* actions */}
         <div className="flex items-center gap-5">
           <button
