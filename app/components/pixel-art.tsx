@@ -144,6 +144,105 @@ export function StarBuddy({
   );
 }
 
+export function PixelHeart({
+  className = "",
+  size = 18,
+  filled = false,
+}: {
+  className?: string;
+  size?: number;
+  filled?: boolean;
+}) {
+  const color = filled ? "#ff5c7a" : "#b9cde6";
+  return (
+    <svg
+      className={className}
+      width={size}
+      height={(size * 6) / 7}
+      viewBox="0 0 7 6"
+      shapeRendering="crispEdges"
+      aria-hidden
+    >
+      <g fill={color}>
+        <rect x="1" y="0" width="2" height="1" />
+        <rect x="4" y="0" width="2" height="1" />
+        <rect x="0" y="1" width="7" height="2" />
+        <rect x="1" y="3" width="5" height="1" />
+        <rect x="2" y="4" width="3" height="1" />
+        <rect x="3" y="5" width="1" height="1" />
+      </g>
+      {filled && <rect x="1" y="1" width="1" height="1" fill="#ffd3dc" />}
+    </svg>
+  );
+}
+
+export function PixelChatBubble({
+  className = "",
+  size = 18,
+  color = "var(--blue)",
+}: {
+  className?: string;
+  size?: number;
+  color?: string;
+}) {
+  return (
+    <svg
+      className={className}
+      width={size}
+      height={(size * 7) / 8}
+      viewBox="0 0 8 7"
+      shapeRendering="crispEdges"
+      aria-hidden
+    >
+      <g fill={color}>
+        <rect x="1" y="0" width="6" height="1" />
+        <rect x="0" y="1" width="8" height="3" />
+        <rect x="1" y="4" width="6" height="1" />
+        <rect x="2" y="5" width="2" height="1" />
+        <rect x="2" y="6" width="1" height="1" />
+      </g>
+      <g fill="var(--white)">
+        <rect x="2" y="2" width="1" height="1" />
+        <rect x="4" y="2" width="1" height="1" />
+        <rect x="6" y="2" width="1" height="1" />
+      </g>
+    </svg>
+  );
+}
+
+/** Paper airplane for the direct messages link. */
+export function PixelPlane({
+  className = "",
+  size = 26,
+  color = "var(--blue-deep)",
+}: {
+  className?: string;
+  size?: number;
+  color?: string;
+}) {
+  return (
+    <svg
+      className={className}
+      width={size}
+      height={size}
+      viewBox="0 0 9 9"
+      shapeRendering="crispEdges"
+      aria-hidden
+    >
+      <g fill={color}>
+        <rect x="8" y="0" width="1" height="1" />
+        <rect x="4" y="1" width="4" height="1" />
+        <rect x="2" y="2" width="5" height="1" />
+        <rect x="0" y="3" width="6" height="1" />
+        <rect x="2" y="4" width="3" height="1" />
+        <rect x="3" y="5" width="2" height="1" />
+        <rect x="3" y="6" width="1" height="1" />
+      </g>
+      <rect x="5" y="4" width="1" height="1" fill="var(--yellow)" />
+    </svg>
+  );
+}
+
 /** Decorative pixel sky used behind auth pages. */
 export function PixelSky() {
   return (
