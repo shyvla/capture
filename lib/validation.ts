@@ -20,6 +20,10 @@ export const COMMENT_WORD_LIMIT = 50;
 export const COMMENT_CHAR_LIMIT = 600;
 export const COMMENT_RULE = `Comments can be up to ${COMMENT_WORD_LIMIT} words.`;
 
+// Post captions (camera page spec: optional, max 250 characters).
+export const CAPTION_CHAR_LIMIT = 250;
+export const CAPTION_RULE = `Captions can be up to ${CAPTION_CHAR_LIMIT} characters.`;
+
 export function countWords(text: string): number {
   return text.trim().split(/\s+/).filter(Boolean).length;
 }

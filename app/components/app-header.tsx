@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { signOut } from "@/app/auth/actions";
-import { PixelPlane, PixelStar } from "@/app/components/pixel-art";
+import { PixelCamera, PixelPlane, PixelStar } from "@/app/components/pixel-art";
 import { PixelAvatar } from "@/app/components/pixel-avatar";
 
 /** Sticky top bar shared by the signed-in pages (feed, profile, …). */
@@ -20,6 +20,13 @@ export function AppHeader({ myUsername }: { myUsername?: string }) {
               SIGN OUT
             </button>
           </form>
+          <Link
+            href="/camera"
+            aria-label="Photo booth"
+            className="pixel-icon-btn"
+          >
+            <PixelCamera size={30} />
+          </Link>
           <Link
             href="/messages"
             aria-label="Direct messages"

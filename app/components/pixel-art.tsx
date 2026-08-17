@@ -243,6 +243,48 @@ export function PixelPlane({
   );
 }
 
+export function PixelPrinter({
+  className = "",
+  size = 26,
+  printing = false,
+}: {
+  className?: string;
+  size?: number;
+  printing?: boolean;
+}) {
+  // 14x12 photo printer with a print sliding out of the slot
+  return (
+    <svg
+      className={className}
+      width={size}
+      height={(size * 12) / 14}
+      viewBox="0 0 14 12"
+      shapeRendering="crispEdges"
+      aria-hidden
+    >
+      {/* body */}
+      <rect x="1" y="2" width="12" height="5" fill="var(--blue)" />
+      <rect x="1" y="2" width="12" height="1" fill="var(--blue-sky)" />
+      <rect x="0" y="2" width="1" height="5" fill="var(--blue-deep)" />
+      <rect x="13" y="2" width="1" height="5" fill="var(--blue-deep)" />
+      <rect x="1" y="1" width="12" height="1" fill="var(--blue-deep)" />
+      <rect x="1" y="6" width="12" height="1" fill="var(--blue-deep)" />
+      {/* status light + button */}
+      <rect x="2" y="3" width="1" height="1" fill="var(--yellow)" />
+      <rect x="11" y="3" width="1" height="1" fill="var(--white)" />
+      {/* slot */}
+      <rect x="3" y="5" width="8" height="1" fill="var(--blue-deep)" />
+      {/* the photo coming out */}
+      <g className={printing ? "pixel-bob" : undefined}>
+        <rect x="4" y="6" width="6" height="5" fill="var(--white)" />
+        <rect x="5" y="7" width="4" height="3" fill="var(--blue-pale)" />
+        <rect x="6" y="8" width="1" height="1" fill="var(--yellow)" />
+        <rect x="8" y="7" width="1" height="1" fill="var(--blue-sky)" />
+      </g>
+    </svg>
+  );
+}
+
 /** Decorative pixel sky used behind auth pages. */
 export function PixelSky() {
   return (
