@@ -28,6 +28,16 @@ const CAPTURE_WIDTH = 640; // internal working resolution (longest side)
 const VIDEO_FPS = 10;
 const VIDEO_SECONDS = 5;
 
+const STICKER_MIN_SCALE = 0.07;
+const STICKER_MAX_SCALE = 0.8;
+// The resize grab handle sits just outside the selection outline's corner.
+const HANDLE_OFFSET = 5;
+const HANDLE_HIT_RADIUS = 18;
+
+function clampScale(scale: number): number {
+  return Math.min(STICKER_MAX_SCALE, Math.max(STICKER_MIN_SCALE, scale));
+}
+
 type Permission = "pending" | "granted" | "denied";
 type Phase =
   | "capture"
@@ -67,7 +77,11 @@ export function CameraBooth({
   const countdownRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const recorderRef = useRef<{ stop: () => void } | null>(null);
   const stickerKeyRef = useRef(1);
-  const dragRef = useRef<{ key: number; dx: number; dy: number } | null>(null);
+  const dragRef = useRef<
+    | { mode: "move"; key: number; dx: number; dy: number }
+    | { mode: "resize"; key: number; startScale: number; startDist: number }
+    | null
+  >(null);
 
   const filter = useMemo(
     () => FILM_FILTERS.find((f) => f.id === filterId) ?? FILM_FILTERS[0],
@@ -270,7 +284,21 @@ export function CameraBooth({
           ctx.strokeStyle = "#ffd94a";
           ctx.lineWidth = 3;
           ctx.setLineDash([8, 6]);
-          ctx.strokeRect(r.x - 5, r.y - 5, r.w + 10, r.h + 10);
+          ctx.strokeRect(
+            r.x - HANDLE_OFFSET,
+            r.y - HANDLE_OFFSET,
+            r.w + HANDLE_OFFSET * 2,
+            r.h + HANDLE_OFFSET * 2
+          );
+          // Corner resize handle.
+          ctx.setLineDash([]);
+          ctx.fillStyle = "#ffd94a";
+          ctx.strokeStyle = "#2e4973";
+          ctx.lineWidth = 2;
+          const hx = r.x + r.w + HANDLE_OFFSET;
+          const hy = r.y + r.h + HANDLE_OFFSET;
+          ctx.fillRect(hx - 7, hy - 7, 14, 14);
+          ctx.strokeRect(hx - 7, hy - 7, 14, 14);
           ctx.restore();
         }
       }
@@ -295,13 +323,40 @@ export function CameraBooth({
     const p = pointerFraction(e);
     const px = p.x * capture.width;
     const py = p.y * capture.height;
+
+    // Grabbing the selected sticker's corner handle starts a resize.
+    const selected = stickers.find((s) => s.key === selectedKey);
+    if (selected) {
+      const r = stickerRect(selected, capture.width, capture.height);
+      const hx = r.x + r.w + HANDLE_OFFSET;
+      const hy = r.y + r.h + HANDLE_OFFSET;
+      if (Math.hypot(px - hx, py - hy) <= HANDLE_HIT_RADIUS) {
+        const startDist = Math.hypot(
+          px - selected.x * capture.width,
+          py - selected.y * capture.height
+        );
+        dragRef.current = {
+          mode: "resize",
+          key: selected.key,
+          startScale: selected.scale,
+          startDist: Math.max(1, startDist),
+        };
+        try {
+          e.currentTarget.setPointerCapture(e.pointerId);
+        } catch {
+          // Synthetic pointer events have no active pointer to capture.
+        }
+        return;
+      }
+    }
+
     // Topmost sticker wins.
     for (let i = stickers.length - 1; i >= 0; i--) {
       const s = stickers[i];
       const r = stickerRect(s, capture.width, capture.height);
       if (px >= r.x && px <= r.x + r.w && py >= r.y && py <= r.y + r.h) {
         setSelectedKey(s.key);
-        dragRef.current = { key: s.key, dx: p.x - s.x, dy: p.y - s.y };
+        dragRef.current = { mode: "move", key: s.key, dx: p.x - s.x, dy: p.y - s.y };
         try {
           e.currentTarget.setPointerCapture(e.pointerId);
         } catch {
@@ -315,18 +370,29 @@ export function CameraBooth({
 
   const onPointerMove = (e: React.PointerEvent<HTMLCanvasElement>) => {
     const drag = dragRef.current;
-    if (!drag || phase !== "edit") return;
+    if (!drag || phase !== "edit" || !capture) return;
     const p = pointerFraction(e);
     setStickers((prev) =>
-      prev.map((s) =>
-        s.key === drag.key
-          ? {
-              ...s,
-              x: Math.min(1, Math.max(0, p.x - drag.dx)),
-              y: Math.min(1, Math.max(0, p.y - drag.dy)),
-            }
-          : s
-      )
+      prev.map((s) => {
+        if (s.key !== drag.key) return s;
+        if (drag.mode === "move") {
+          return {
+            ...s,
+            x: Math.min(1, Math.max(0, p.x - drag.dx)),
+            y: Math.min(1, Math.max(0, p.y - drag.dy)),
+          };
+        }
+        // Resize: scale by how far the pointer moved from the sticker center
+        // relative to where the handle was grabbed.
+        const dist = Math.hypot(
+          p.x * capture.width - s.x * capture.width,
+          p.y * capture.height - s.y * capture.height
+        );
+        return {
+          ...s,
+          scale: clampScale(drag.startScale * (dist / drag.startDist)),
+        };
+      })
     );
   };
 
@@ -347,7 +413,7 @@ export function CameraBooth({
     setStickers((prev) =>
       prev.map((s) =>
         s.key === selectedKey
-          ? { ...s, scale: Math.min(0.8, Math.max(0.07, s.scale * factor)) }
+          ? { ...s, scale: clampScale(s.scale * factor) }
           : s
       )
     );
@@ -648,7 +714,8 @@ export function CameraBooth({
             <div className="mb-3 flex items-center justify-between">
               <p className="pixel-label">STICKERS</p>
               <p className="text-base text-blue-brand">
-                tap to add, then drag on the photo · animated ones post as GIF
+                tap to add, drag to move, pull the corner handle to resize ·
+                animated ones post as GIF
               </p>
             </div>
             <div className="flex flex-wrap gap-3">
